@@ -3,7 +3,7 @@ import cv2
 import random
 import time
 from face_tracking import FaceTracker
-PIXELSIZE=10
+PIXELSIZE=8
 
 def resizeImg(img,pixel_size):
     h,w,c=img.shape
@@ -17,7 +17,7 @@ def resizeImg(img,pixel_size):
     return img
 
 def pixelize_colored(img,pixel_size):
-    img=resizeImg(img,pixel_size)
+    #img=resizeImg(img,pixel_size)
     h,w,c=img.shape
     for wi in range (0,w,pixel_size):
         for hi in range (0,h,pixel_size):
@@ -29,13 +29,6 @@ def pixelize_colored(img,pixel_size):
             temp_img[:,:,1]=g
             temp_img[:,:,2]=r
     return img
-
-def pixelize_colored_opt(img,pixel_size):
-    img=resizeImg(img,pixel_size)
-    h,w,c=img.shape
-    small=cv2.resize(img,(int(w/pixel_size),int(h/pixel_size)),interpolation=cv2.INTER_LINEAR)
-    result = cv2.resize(small,(w,h),interpolation=cv2.INTER_NEAREST)
-    return result
 
 def pixelize_grayscale(img,pixel_size):	
     img=resizeImg(img,pixel_size)
@@ -70,9 +63,11 @@ def pixelize_randomized(img,pixel_size):
     img=np.clip(img,0,255)
     return img.astype('uint8')
 
-def pixelize_ascii(img,pixel_size):
-    density='.\'`^",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$ '
-    #density=' .:-=+*#%@'
+def pixelize_ascii(img,pixel_size,simple_density=False):
+    if simple_density:
+        density=' .:-=+*#%@'
+    else:
+        density=' .\'`^",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
     img=resizeImg(img,pixel_size)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     ascii_img= np.zeros(img.shape,dtype=np.uint8)
@@ -81,14 +76,19 @@ def pixelize_ascii(img,pixel_size):
         for hi in range (0,h,pixel_size):
             temp_img=img[hi:(hi+pixel_size),wi:(wi+pixel_size)]
             c = np.mean(temp_img[:,:])
-            char = density[int((c*69)/255)]
-            cv2.putText(ascii_img,char,(wi,hi+pixel_size),cv2.FONT_HERSHEY_SIMPLEX,0.4,color=c,thickness=1)
+            if simple_density:
+                char = density[int((c*9)/255)]
+            else:
+                char = density[int((c*69)/255)]
+            cv2.putText(ascii_img,char,(wi,hi+pixel_size),cv2.FONT_HERSHEY_SIMPLEX,0.033*PIXELSIZE,color=c,thickness=1)
     return ascii_img
 
 
-def img_to_ascii(img,pixel_size):
-    #density='.\'`^",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
-    density=' .:-=+*#%@'
+def img_to_ascii(img,pixel_size,simple_density=False):
+    if simple_density:
+        density=' .:-=+*#%@'
+    else:
+        density='.\'`^",:;Il!i><~+_-?][}{1)(|\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$'
     img=resizeImg(img,pixel_size)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     h,w=img.shape
@@ -96,28 +96,17 @@ def img_to_ascii(img,pixel_size):
         for wi in range (0,w,pixel_size):
             temp_img=img[hi:(hi+pixel_size),wi:(wi+pixel_size)]
             c = np.mean(temp_img[:,:])
-            char = density[int((c*9)/255)]
-            #char = density[int((c*69)/255)]
+            if simple_density:
+                char = density[int((c*9)/255)]
+            else:
+                char = density[int((c*69)/255)]
             print(char,end='')
-            #temp_img[:,:]=c
         print('')
     return img    
 def negative(img):
     return 255-img
-def blur(img,radius):
-    img=resizeImg(img,radius)
-    h,w,c=img.shape
-    for hi in range(0,h,radius):
-        for wi in range (0,w,radius):
-            temp_img=img[hi:(hi+radius),wi:(wi+radius)]
-            print (temp_img.shape)
-            print(img.shape)
-            img[hi,wi,0]=np.mean(temp_img[:,:,0])
-            img[hi,wi,1]=np.mean(temp_img[:,:,1])
-            img[hi,wi,2]=np.mean(temp_img[:,:,2])
-    return img
 
-
+"""
 faceTracker=FaceTracker()
 vid = cv2.VideoCapture(0)
 while(True):
@@ -125,8 +114,7 @@ while(True):
     ret, frame = vid.read()
     # Display the resulting frame
     #frame=pixelize_ascii(negative(frame),PIXELSIZE)
-    #frame=pixelize_colored_opt(frame,PIXELSIZE)
-    #frame=blur(frame,PIXELSIZE)
+    #frame=pixelize_colored(frame,PIXELSIZE)
     #frame=negative(frame)
     faces = faceTracker.trackFaces(frame,drawBoxes=False)
     for (x, y, w, h) in faces:
@@ -139,8 +127,39 @@ while(True):
         break
 vid.release()
 cv2.destroyAllWindows()
+"""
+
+sample =cv2.imread('Sample.jpg')
+
+img=pixelize_ascii(sample,PIXELSIZE,simple_density=True)
+cv2.imwrite('sample_PIXELIZED_ASCII_SIMPLE.jpg',img)
+
+img=pixelize_ascii(sample,PIXELSIZE,simple_density=False)
+cv2.imwrite('sample_PIXELIZED_ASCII.jpg',img)
+
+img=pixelize_colored(sample,PIXELSIZE)
+cv2.imwrite('sample_PIXELIZED_COLORED.jpg',img)
+
+img=pixelize_grayscale(sample,PIXELSIZE)
+cv2.imwrite('sample_PIXELIZED_GRAYSCALE.jpg',img)
 
 
-#img =cv2.imread('homer.jpg')
-#img=img_to_ascii(img,PIXELSIZE)
-#cv2.imwrite('giovanni_muciaccia_cropped.jpg',img)
+img=pixelize_dot(sample,PIXELSIZE)
+cv2.imwrite('sample_PIXELIZED_DOT.jpg',img)
+
+img=pixelize_randomized(sample,PIXELSIZE)
+cv2.imwrite('sample_PIXELIZED_RANDOMIZED.jpg',img)
+
+faceTracker=FaceTracker()
+sample =cv2.imread('Sample.jpg')
+faces = faceTracker.trackFaces(sample,drawBoxes=False)
+for (x, y, w, h) in faces:
+    np.random.shuffle(sample[y:y+h,x:x+w,:])
+cv2.imwrite('sample_FACE_SCRUMBLE.jpg',sample)
+
+faceTracker=FaceTracker()
+sample =cv2.imread('Sample.jpg')
+faces = faceTracker.trackFaces(sample,drawBoxes=False)
+for (x, y, w, h) in faces:
+    sample[y:y+h,x:x+w,:]=pixelize_randomized(sample[y:y+h,x:x+w,:],PIXELSIZE)
+cv2.imwrite('sample_FACE_PIXELIZED.jpg',sample)
