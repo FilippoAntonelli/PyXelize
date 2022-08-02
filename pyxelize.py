@@ -55,9 +55,9 @@ def pixelize_dot(img,pixel_size):
             cv2.circle(circle_img,(wi+int(pixel_size/2),hi+int(pixel_size/2)),int(pixel_size/2),(b,g,r),-1)
     return circle_img
 
-def pixelize_randomized(img,pixel_size):
+def pixelize_randomized(img,pixel_size,delta_min_max=20):
     img=pixelize_colored(img,pixel_size)
-    randomized_delta=np.random.randint(-20,20,img.shape,int)
+    randomized_delta=np.random.randint(-delta_min_max,delta_min_max,img.shape,int)
     print(randomized_delta.shape)
     img=img+randomized_delta
     img=np.clip(img,0,255)
