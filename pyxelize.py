@@ -129,37 +129,37 @@ vid.release()
 cv2.destroyAllWindows()
 """
 
-sample =cv2.imread('Sample.jpg')
+sample =cv2.imread('Samples/Sample.jpg')
 
 img=pixelize_ascii(sample,PIXELSIZE,simple_density=True)
-cv2.imwrite('sample_PIXELIZED_ASCII_SIMPLE.jpg',img)
+cv2.imwrite('Samples/sample_PIXELIZED_ASCII_SIMPLE.jpg',img)
 
 img=pixelize_ascii(sample,PIXELSIZE,simple_density=False)
-cv2.imwrite('sample_PIXELIZED_ASCII.jpg',img)
+cv2.imwrite('Samples/sample_PIXELIZED_ASCII.jpg',img)
 
 img=pixelize_colored(sample,PIXELSIZE)
-cv2.imwrite('sample_PIXELIZED_COLORED.jpg',img)
+cv2.imwrite('Samples/sample_PIXELIZED_COLORED.jpg',img)
 
 img=pixelize_grayscale(sample,PIXELSIZE)
-cv2.imwrite('sample_PIXELIZED_GRAYSCALE.jpg',img)
+cv2.imwrite('Samples/sample_PIXELIZED_GRAYSCALE.jpg',img)
 
 
 img=pixelize_dot(sample,PIXELSIZE)
-cv2.imwrite('sample_PIXELIZED_DOT.jpg',img)
+cv2.imwrite('Samples/sample_PIXELIZED_DOT.jpg',img)
 
 img=pixelize_randomized(sample,PIXELSIZE)
-cv2.imwrite('sample_PIXELIZED_RANDOMIZED.jpg',img)
+cv2.imwrite('Samples/sample_PIXELIZED_RANDOMIZED.jpg',img)
 
 faceTracker=FaceTracker()
-sample =cv2.imread('Sample.jpg')
+sample =cv2.imread('Samples/Sample.jpg')
 faces = faceTracker.trackFaces(sample,drawBoxes=False)
 for (x, y, w, h) in faces:
     np.random.shuffle(sample[y:y+h,x:x+w,:])
-cv2.imwrite('sample_FACE_SCRUMBLE.jpg',sample)
+cv2.imwrite('Samples/sample_FACE_SCRUMBLE.jpg',sample)
 
 faceTracker=FaceTracker()
-sample =cv2.imread('Sample.jpg')
+sample =cv2.imread('Samples/Sample.jpg')
 faces = faceTracker.trackFaces(sample,drawBoxes=False)
 for (x, y, w, h) in faces:
     sample[y:y+h,x:x+w,:]=pixelize_randomized(sample[y:y+h,x:x+w,:],PIXELSIZE)
-cv2.imwrite('sample_FACE_PIXELIZED.jpg',sample)
+cv2.imwrite('Samples/sample_FACE_PIXELIZED.jpg',sample)
